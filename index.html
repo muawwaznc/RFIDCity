@@ -1388,6 +1388,77 @@
 
     <!-- Preloader -->
     <div id="preloader"></div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- Add this script before the closing </body> tag or in a separate JS file -->
+    <script>
+        // Handle form submission
+        document.querySelector('.php-email-form').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const form = event.target;
+            const formData = new FormData(form);
+
+            // Collect form data
+            const formObject = {};
+            formData.forEach((value, key) => {
+                formObject[key] = value;
+            });
+            console.log("Muawwaz1");
+            // Send the form data using SendGrid API
+            sendEmail(formObject);
+        });
+
+        async function sendEmail(formData) {
+            const emailData = {
+                name: formData.name,
+                bname: formData.bname,
+                email: formData.email,
+                phone: formData.phone,
+                message: formData.message
+            };
+
+            try {
+                const msg = {
+                    to: "support@iveew.co", // Replace with the email address you want to receive messages
+                    from: "support@iveew.co", // Replace with a verified sender email in SendGrid
+                    subject: `New Contact Form Submission from ${name}`,
+                    text: `
+                        Name: ${emailData.name}
+                        Business Name: ${emailData.bname}
+                        Email: ${emailData.email}
+                        Phone: ${emailData.phone}
+                        Message: ${emailData.message}
+                    `,
+                    html: `
+                        <p><strong>Name:</strong> ${emailData.name}</p>
+                        <p><strong>Business Name:</strong> ${emailData.bname}</p>
+                        <p><strong>Email:</strong> ${emailData.email}</p>
+                        <p><strong>Phone:</strong> ${emailData.phone}</p>
+                        <p><strong>Message:</strong></p>
+                        <p>${emailData.message}</p>
+                    `,
+                };
+                const response = await axios.post('http://localhost:3000/send-email', emailData, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                // Handle success
+                if (response.status === 200) {
+                    document.querySelector('.sent-message').style.display = 'block';
+                    document.querySelector('.error-message').style.display = 'none';
+                    form.reset();
+                }
+            } catch (error) {
+                document.querySelector('.error-message').innerText = `Error: ${error.message}`;
+                document.querySelector('.error-message').style.display = 'block';
+                document.querySelector('.sent-message').style.display = 'none';
+            }
+        }
+
+
+    </script>
 
     <!-- Vendor JS Files -->
     <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
